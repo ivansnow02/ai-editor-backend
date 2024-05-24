@@ -1,6 +1,6 @@
 from urllib import response
 
-from generate.llm import generate
+from app.generate.llm import generate
 from . import main
 
 from flask import Response, jsonify, request
