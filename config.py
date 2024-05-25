@@ -11,6 +11,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     
+    
+    
     @staticmethod
     def init_app(app):
         pass
@@ -38,5 +40,5 @@ config = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "production": ProductionConfig,
-    "default": DevelopmentConfig
+    "default": DevelopmentConfig,
 }
