@@ -10,6 +10,7 @@ class Config:
     # 数据库规则
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    REDIS_URL = os.environ.get('REDIS_URL') or "redis://localhost"
     
     
     
@@ -41,4 +42,5 @@ config = {
     "testing": TestingConfig,
     "production": ProductionConfig,
     "default": DevelopmentConfig,
+
 }
