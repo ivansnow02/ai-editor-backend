@@ -36,6 +36,8 @@ uvicorn app.main:app --reload
 
 ## 接口文档
 
+> 可直接访问`/docs`查看FastAPI的交互式文档
+
 ### 摘要
 
 #### 请求
