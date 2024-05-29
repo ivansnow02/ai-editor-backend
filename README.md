@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-基于大小模型的文本编辑器后端，使用 Flask 框架实现。
+基于大小模型的文本编辑器后端，使用 FastAPI 框架实现。
 
 
 ## 功能特性
@@ -12,7 +12,7 @@
 - [x] 续写
 - [x] 病句改写
 - [x] 翻译
-- [ ] 流式传输
+- [x] 流式对话
 - [ ] 图像OCR
 - [ ] 语音识别
 
@@ -31,7 +31,7 @@ export EB_AGENT_ACCESS_TOKEN = "your_access_token" # linux
 $env:ERNIE_BOT_ACCESS_TOKEN = "your_access_token" # powershell
 
 # 运行
-flask run
+uvicorn app.main:app --reload
 ```
 
 ## 接口文档
@@ -57,7 +57,7 @@ POST /api/generate/abstract
 {
     "code": 200,
     "data": "",
-    "message": "success"
+    "msg": "success"
 }
 ```
 
@@ -82,7 +82,7 @@ POST /api/generate/polish
 {
     "code": 200,
     "data": "",
-    "message": "success"
+    "msg": "success"
 }
 ```
 
@@ -106,7 +106,7 @@ POST /api/generate/complete
 {
     "code": 200,
     "data": "",
-    "message": "success"
+    "msg": "success"
 }
 ```
 
@@ -130,8 +130,35 @@ POST /api/generate/fix
 {
     "code": 200,
     "data": "",
-    "message": "success"
+    "msg": "success"
 }
 ```
 
+### 流式对话
 
+#### 请求
+
+```http
+POST /api/stream/*
+```
+
+#### 使用
+
+```js
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+
+const sendMessage = async () => {
+  await fetchEventSource('http://localhost:8000/api/stream/completion', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      prompt: "你的prompt",
+    }),
+    onmessage: (event) => {
+      console.log(event.data);
+    },
+  });
+}
+```
