@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from dotenv import load_dotenv
+
+load_dotenv()
 app = FastAPI()
 
-from .routers import generate, stream
+from .routers import generate, stream, langserve, chat_with_history
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,6 +17,8 @@ app.add_middleware(
 
 app.include_router(generate.router)
 app.include_router(stream.router)
+app.include_router(langserve.router)
+app.include_router(chat_with_history.router)
 
 
 if __name__ == "__main__":

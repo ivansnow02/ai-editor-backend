@@ -7,6 +7,7 @@ from pydantic import Field
 from erniebot_agent.chat_models import ERNIEBot
 from erniebot_agent.memory import HumanMessage, SystemMessage, Message
 
+
 MODEL = "ernie-speed"
 
 async def complete(prompt) -> str:
