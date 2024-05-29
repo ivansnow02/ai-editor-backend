@@ -36,113 +36,10 @@ uvicorn app.main:app --reload
 
 ## 接口文档
 
-> 可直接访问`/docs`查看FastAPI的交互式文档
-
-### 摘要
-
-#### 请求
-
-```http
-POST /api/generate/abstract
-```
-
-```json
-{
-    "prompt": "文本",
-    "word_count": 100
-}
-```
-
-#### 响应
-
-```json
-{
-    "code": 200,
-    "data": "",
-    "msg": "success"
-}
-```
-
-### 修饰
-
-#### 请求
-
-```http
-POST /api/generate/polish
-```
-
-```json
-{
-    "prompt": "文本",
-    "style": "文体"
-}
-```
-
-#### 响应
-
-```json
-{
-    "code": 200,
-    "data": "",
-    "msg": "success"
-}
-```
-
-### 续写
-
-#### 请求
-
-```http
-POST /api/generate/complete
-```
-
-```json
-{
-    "prompt": "文本",
-}
-```
-
-#### 响应
-
-```json
-{
-    "code": 200,
-    "data": "",
-    "msg": "success"
-}
-```
-
-### 病句改写
-
-#### 请求
-
-```http
-POST /api/generate/fix
-```
-
-```json
-{
-    "prompt": "文本",
-}
-```
-
-#### 响应
-
-```json
-{
-    "code": 200,
-    "data": "",
-    "msg": "success"
-}
-```
+> 本项目使用 FastAPI 自动生成接口文档，访问 `/docs` 查看。
 
 ### 流式对话
 
-#### 请求
-
-```http
-POST /api/stream/*
-```
 
 #### 使用
 
@@ -150,13 +47,13 @@ POST /api/stream/*
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 const sendMessage = async () => {
-  await fetchEventSource('http://localhost:8000/api/stream/completion', {
+  await fetchEventSource('流式接口api地址', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      prompt: "你的prompt",
+      // 请求体
     }),
     onmessage: (event) => {
       console.log(event.data);
