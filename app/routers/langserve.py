@@ -27,7 +27,7 @@ add_routes(
     app=router,
     runnable=completion_chain,
     path="/completion",
-    enabled_endpoints=["invoke", "stream"],
+    enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
 abstract_chain = abstract_prompt | ErnieBot(model="ernie-speed")
@@ -36,7 +36,7 @@ add_routes(
     app=router,
     runnable=abstract_chain,
     path="/abstract",
-    enabled_endpoints=["invoke", "stream"],
+    enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
 
@@ -46,7 +46,7 @@ add_routes(
     app=router,
     runnable=fix_chain,
     path="/fix",
-    enabled_endpoints=["invoke", "stream"],
+    enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
 polish_prompt = polish_prompt | ErnieBot(model="ernie-speed")
@@ -55,7 +55,7 @@ add_routes(
     app=router,
     runnable=polish_prompt,
     path="/polish",
-    enabled_endpoints=["invoke", "stream"],
+    enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
 translate_chain = translate_prompt | ErnieBot(model="ernie-speed")
@@ -64,5 +64,5 @@ add_routes(
     app=router,
     runnable=translate_chain,
     path="/translate",
-    enabled_endpoints=["invoke", "stream"],
+    enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
