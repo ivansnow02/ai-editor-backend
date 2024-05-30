@@ -28,7 +28,11 @@ pip install -r requirements.txt
 ```bash
 # 使用文心一言
 export EB_AGENT_ACCESS_TOKEN = "your_access_token" # linux
-$env:ERNIE_BOT_ACCESS_TOKEN = "your_access_token" # powershell
+$env:EB_ACCESS_TOKEN = "your_access_token" # powershell
+
+# 使用langserve
+export AISTUDIO_ACCESS_TOKEN = "your_access_token" # linux
+$env:AISTUDIO_ACCESS_TOKEN = "your_access_token" # powershell
 
 # 运行
 uvicorn app.main:app --reload
