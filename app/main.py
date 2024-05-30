@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 app = FastAPI()
 
-from .routers import generate, stream, langserve, chat_with_history
+from app.routers import generate, stream, langserve, chat_with_history
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
