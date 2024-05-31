@@ -1,12 +1,9 @@
-# TODO 正在开发中
 from erniebot_agent.extensions.langchain.llms import ErnieBot
 import re
-from pathlib import Path
-from typing import Any, Callable, Dict, Union
+from typing import Any, Callable, Dict
 
-from fastapi import FastAPI, HTTPException, Request
-from langchain_community.chat_message_histories import FileChatMessageHistory
-from langchain_core import __version__
+from fastapi import HTTPException, Request
+from langchain_community.chat_message_histories import RedisChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import ConfigurableFieldSpec
@@ -18,56 +15,41 @@ from fastapi import APIRouter
 from langserve import add_routes
 
 
-
-
+import re
 
 def _is_valid_identifier(value: str) -> bool:
-    """Check if the value is a valid identifier."""
-    # Use a regular expression to match the allowed characters
+    """
+    判断给定的字符串是否是一个有效的标识符。
+
+    Args:
+        value (str): 要检查的字符串。
+
+    Returns:
+        bool: 如果字符串是有效的标识符，则返回True；否则返回False。
+    """
     valid_characters = re.compile(r"^[a-zA-Z0-9-_]+$")
     return bool(valid_characters.match(value))
 
 
-def create_session_factory(
-    base_dir: Union[str, Path],
-) -> Callable[[str], BaseChatMessageHistory]:
-    """Create a factory that can retrieve chat histories.
-
-    The chat histories are keyed by user ID and conversation ID.
-
-    Args:
-        base_dir: Base directory to use for storing the chat histories.
+def create_session_factory() -> Callable[[str, str], BaseChatMessageHistory]:
+    """
+    创建一个会话工厂，返回一个用于获取聊天历史记录的函数。
 
     Returns:
-        A factory that can retrieve chat histories keyed by user ID and conversation ID.
+        一个可调用对象，接受两个参数（user_id 和 conversation_id），并返回聊天历史记录。
     """
-    base_dir_ = Path(base_dir) if isinstance(base_dir, str) else base_dir
-    if not base_dir_.exists():
-        base_dir_.mkdir(parents=True)
-
-    def get_chat_history(user_id: str, conversation_id: str) -> FileChatMessageHistory:
-        """Get a chat history from a user id and conversation id."""
+    def get_chat_history(user_id: str, conversation_id: str) -> RedisChatMessageHistory:
         if not _is_valid_identifier(user_id):
             raise ValueError(
-                f"User ID {user_id} is not in a valid format. "
-                "User ID must only contain alphanumeric characters, "
-                "hyphens, and underscores."
-                "Please include a valid cookie in the request headers called 'user-id'."
+                f"用户ID {user_id} 不符合有效格式。"
             )
         if not _is_valid_identifier(conversation_id):
             raise ValueError(
-                f"Conversation ID {conversation_id} is not in a valid format. "
-                "Conversation ID must only contain alphanumeric characters, "
-                "hyphens, and underscores. Please provide a valid conversation id "
-                "via config. For example, "
-                "chain.invoke(.., {'configurable': {'conversation_id': '123'}})"
+                f"对话ID {conversation_id} 不符合有效格式。"
             )
 
-        user_dir = base_dir_ / user_id
-        if not user_dir.exists():
-            user_dir.mkdir(parents=True)
-        file_path = user_dir / f"{conversation_id}.json"
-        return FileChatMessageHistory(str(file_path))
+        history = RedisChatMessageHistory(session_id=f"{conversation_id}")
+        return history
 
     return get_chat_history
 
@@ -82,29 +64,35 @@ router = APIRouter(
 def _per_request_config_modifier(
     config: Dict[str, Any], request: Request
 ) -> Dict[str, Any]:
-    """Update the config"""
+    """
+    修改每个请求的配置。
+
+    Args:
+        config (Dict[str, Any]): 原始配置字典。
+        request (Request): 请求对象。
+
+    Returns:
+        Dict[str, Any]: 修改后的配置字典。
+    """
     config = config.copy()
     configurable = config.get("configurable", {})
-    # Look for a cookie named "user_id"
-    user_id = request.cookies.get("user_id", None)
+    user_id: str | None = request.cookies.get("user_id", None)
 
     if user_id is None:
         raise HTTPException(
             status_code=400,
-            detail="No user id found. Please set a cookie named 'user_id'.",
+            detail="请设置cookie：'user_id'.",
         )
-
     configurable["user_id"] = user_id
     config["configurable"] = configurable
     return config
 
 
-# Declare a chain
-prompt = ChatPromptTemplate.from_messages(
-    [
-        ("system", "You're an assistant by the name of Bob."),
+prompt: ChatPromptTemplate = ChatPromptTemplate.from_messages(
+    messages=[
+        ("system", "你是一个专业的文本编辑器助手，你的任务是帮助用户编辑文本。"),
         MessagesPlaceholder(variable_name="history"),
-        ("human", "{human_input}"),
+        ("user", "{human_input}"),
     ]
 )
 
@@ -112,15 +100,12 @@ chain = prompt | ErnieBot(model="ernie-speed")
 
 
 class InputChat(TypedDict):
-    """Input for the chat endpoint."""
-
     human_input: str
-    """Human input"""
 
 
 chain_with_history = RunnableWithMessageHistory(
-    chain,
-    create_session_factory("chat_histories"),
+    runnable=chain,
+    get_session_history=create_session_factory(),
     input_messages_key="human_input",
     history_messages_key="history",
     history_factory_config=[
@@ -128,7 +113,7 @@ chain_with_history = RunnableWithMessageHistory(
             id="user_id",
             annotation=str,
             name="User ID",
-            description="Unique identifier for the user.",
+            description="用户的身份ID",
             default="",
             is_shared=True,
         ),
@@ -136,7 +121,7 @@ chain_with_history = RunnableWithMessageHistory(
             id="conversation_id",
             annotation=str,
             name="Conversation ID",
-            description="Unique identifier for the conversation.",
+            description="对话的ID",
             default="",
             is_shared=True,
         ),
@@ -149,14 +134,5 @@ add_routes(
     chain_with_history,
     path="/chat_with_history",
     per_req_config_modifier=_per_request_config_modifier,
-    # Disable playground and batch
-    # 1) Playground we're passing information via headers, which is not supported via
-    #    the playground right now.
-    # 2) Disable batch to avoid users being confused. Batch will work fine
-    #    as long as users invoke it with multiple configs appropriately, but
-    #    without validation users are likely going to forget to do that.
-    #    In addition, there's likely little sense in support batch for a chatbot.
-    disabled_endpoints=["playground", "batch"],
+    enabled_endpoints=["invoke", "stream", "stream_log"],
 )
-
-
