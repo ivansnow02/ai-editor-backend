@@ -7,7 +7,7 @@
 > 需要将pandantic版本降级到1.10.13否则无法在`/docs`中显示langserve相关接口
 
 ```bash
-pip install pandantic==1.10.13
+pip install pydantic==1.10.13
 ```
 
 ### langserve接口文档
@@ -395,4 +395,17 @@ content-type: application/json
   "kwargs": {}
 }
 
+```
+
+### 总结文档
+
+```http
+POST /api/langserve/file_summary/invoke
+{
+  "input": {
+    "files": "文件的base64编码"
+  },
+  "config": {},
+  "kwargs": {}
+}
 ```
