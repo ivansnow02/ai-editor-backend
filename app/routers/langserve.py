@@ -1,9 +1,6 @@
-from dotenv import load_dotenv
-from fastapi import APIRouter, FastAPI, Request
-from langchain.prompts import ChatPromptTemplate
+from fastapi import APIRouter
 from langserve import add_routes
 from erniebot_agent.extensions.langchain.llms import ErnieBot
-from pydantic import BaseModel
 from app.generate.prompts import (
     abstract_prompt,
     completion_prompt,

@@ -15,8 +15,6 @@ from fastapi import APIRouter
 from langserve import add_routes
 
 
-import re
-
 def _is_valid_identifier(value: str) -> bool:
     """
     判断给定的字符串是否是一个有效的标识符。
