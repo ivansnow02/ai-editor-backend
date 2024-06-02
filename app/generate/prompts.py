@@ -1,4 +1,4 @@
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 
 
 completion_prompt = ChatPromptTemplate.from_messages(
@@ -51,3 +51,22 @@ fix_prompt = ChatPromptTemplate.from_messages(
         ("user", "{human_input}"),
     ]
 )
+
+
+refine_template = (
+    "你的工作是编写最终摘要\n"
+    "我们已经提供了一定程度的现有摘要：{existing_answer}\n"
+    "我们有机会完善现有的总结"
+    "（仅在需要时）下面有更多上下文。\n\n"
+    "------------\n"
+    "{text}\n"
+    "------------\n"
+    "鉴于新的背景，完善原始摘要"
+    "如果上下文没有用，请返回原始摘要。"
+)
+refine_prompt = PromptTemplate.from_template(refine_template)
+
+summary_template = """写出以下内容的简洁摘要：
+{text}
+简要总结"""
+summary_prompt = PromptTemplate.from_template(summary_template)
