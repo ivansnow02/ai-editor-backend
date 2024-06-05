@@ -7,7 +7,7 @@ from langchain.chains.summarize import load_summarize_chain
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_core.runnables.base import RunnableLambda
 import magic
-from pydantic import Field
+from langchain_core.pydantic_v1 import Field
 from langchain_core.document_loaders import Blob
 from langchain_community.document_loaders.parsers.pdf import PDFMinerParser
 from langchain_community.document_loaders.parsers.msword import MsWordParser
@@ -15,7 +15,7 @@ from langchain_community.document_loaders.parsers.txt import TextParser
 from langchain_community.document_loaders.parsers.html import BS4HTMLParser
 from langchain_community.document_loaders.parsers.generic import MimeTypeBasedParser
 
-from ..generate.llm import LlmModel
+from ..generate.llm import ChatModel, LlmModel
 from app.generate.prompts import (
     abstract_prompt,
     completion_prompt,
@@ -28,6 +28,7 @@ from app.generate.prompts import (
 
 
 model = LlmModel()
+cmodel = ChatModel()
 
 router = APIRouter(
     prefix="/api/langserve",
@@ -47,7 +48,7 @@ add_routes(
 )
 
 
-fix_chain = fix_prompt | model
+fix_chain = fix_prompt | cmodel
 
 add_routes(
     app=router,
@@ -56,7 +57,7 @@ add_routes(
     enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
-polish_prompt = polish_prompt | model
+polish_prompt = polish_prompt | cmodel
 
 add_routes(
     app=router,
@@ -65,7 +66,7 @@ add_routes(
     enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
-translate_chain = translate_prompt | model
+translate_chain = translate_prompt | cmodel
 
 add_routes(
     app=router,
@@ -75,7 +76,7 @@ add_routes(
 )
 
 
-abstract_chain = abstract_prompt | model
+abstract_chain = abstract_prompt | cmodel
 
 add_routes(
     app=router,

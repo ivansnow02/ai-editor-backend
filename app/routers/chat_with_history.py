@@ -15,6 +15,8 @@ from fastapi import APIRouter
 
 from langserve import add_routes
 
+from ..generate.llm import ChatModel
+
 
 def _is_valid_identifier(value: str) -> bool:
     """
@@ -95,7 +97,7 @@ prompt: ChatPromptTemplate = ChatPromptTemplate.from_messages(
     ]
 )
 
-chain = prompt | ErnieBot(model="ernie-speed")
+chain = prompt | ChatModel()
 
 
 class InputChat(TypedDict):
