@@ -3,9 +3,7 @@ from typing import List
 from fastapi import APIRouter
 from langchain_core.documents.base import Document
 from langserve import CustomUserType, add_routes
-from erniebot_agent.extensions.langchain.llms import ErnieBot
 from langchain.chains.summarize import load_summarize_chain
-from erniebot_agent.extensions.langchain.llms import ErnieBot
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_core.runnables.base import RunnableLambda
 import magic
@@ -17,6 +15,7 @@ from langchain_community.document_loaders.parsers.txt import TextParser
 from langchain_community.document_loaders.parsers.html import BS4HTMLParser
 from langchain_community.document_loaders.parsers.generic import MimeTypeBasedParser
 
+from ..generate.llm import LlmModel
 from app.generate.prompts import (
     abstract_prompt,
     completion_prompt,
@@ -27,6 +26,9 @@ from app.generate.prompts import (
     refine_prompt,
 )
 
+
+model = LlmModel()
+
 router = APIRouter(
     prefix="/api/langserve",
     tags=["langserve"],
@@ -34,7 +36,7 @@ router = APIRouter(
 )
 
 
-completion_chain = completion_prompt | ErnieBot(model="ernie-speed")
+completion_chain = completion_prompt | model
 
 
 add_routes(
@@ -45,7 +47,7 @@ add_routes(
 )
 
 
-fix_chain = fix_prompt | ErnieBot(model="ernie-speed")
+fix_chain = fix_prompt | model
 
 add_routes(
     app=router,
@@ -54,7 +56,7 @@ add_routes(
     enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
-polish_prompt = polish_prompt | ErnieBot(model="ernie-speed")
+polish_prompt = polish_prompt | model
 
 add_routes(
     app=router,
@@ -63,7 +65,7 @@ add_routes(
     enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
-translate_chain = translate_prompt | ErnieBot(model="ernie-speed")
+translate_chain = translate_prompt | model
 
 add_routes(
     app=router,
@@ -73,7 +75,7 @@ add_routes(
 )
 
 
-abstract_chain = abstract_prompt | ErnieBot(model="ernie-speed")
+abstract_chain = abstract_prompt | model
 
 add_routes(
     app=router,
@@ -106,7 +108,7 @@ text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
 
 
 summary_chain = load_summarize_chain(
-    llm=ErnieBot(model="ernie-speed"),
+    llm=model,
     chain_type="refine",
     question_prompt=summary_prompt,
     refine_prompt=refine_prompt,
