@@ -1,8 +1,8 @@
-## 接口文档
+# 接口文档
 
 > 本项目使用 FastAPI 自动生成接口文档，访问 `/docs` 查看。
 
-### 推荐使用langserve
+## 推荐使用langserve
 
 > 需要将pandantic版本降级到1.10.13否则无法在`/docs`中显示langserve相关接口
 
@@ -10,12 +10,12 @@
 pip install pydantic==1.10.13
 ```
 
-### langserve接口文档
+## langserve接口文档
 
-#### 续写invoke
+### 续写invoke
 
-```bash
-/api/langserve/completion/invoke
+```json
+POST /api/langserve/completion/invoke
 # POST请求体
 {
   "input": {
@@ -41,11 +41,11 @@ pip install pydantic==1.10.13
 
 ```
 
-#### 续写stream
+### 续写stream
 
-```bash
+```json
 
-/api/langserve/completion/stream
+POST /api/langserve/completion/stream
 
 # POST请求体
 {
@@ -125,10 +125,10 @@ event: end
 
 ```
 
-#### 修饰invoke
+### 修饰invoke
 
-```bash
-/api/langserve/polish/invoke
+```json
+POST /api/langserve/polish/invoke
 
 # POST请求体
 {
@@ -157,11 +157,11 @@ event: end
 
 ```
 
-#### 修饰stream
+### 修饰stream
 
-```bash
+```json
 
-/api/langserve/polish/stream
+POST /api/langserve/polish/stream
 
 {
   "input": {
@@ -174,26 +174,29 @@ event: end
 
 # 返回 200
 event: metadata
-data: {"run_id": "f5050aae-c0ed-48b7-9ad2-063c6fe3e210"}
+data: {"run_id": "939b3556-a4de-42c0-81ac-15dd44a907df"}
 
 event: data
-data: "请您提供"
+data: {"content":"好的，","additional_kwargs":{},"response_metadata":{},"type":"AIMessageChunk","name":null,"id":"run-8a1ba257-cd7f-4559-892a-2d54ab369b48","example":false,"tool_calls":[],"invalid_tool_calls":[],"usage_metadata":null,"tool_call_chunks":[]}
 
 event: data
-data: "需要润色的文本内容，我将根据您的要求为您修改成“string”风格。"
+data: {"content":"我会按照您的要求以string风格进行文本润色。","additional_kwargs":{},"response_metadata":{},"type":"AIMessageChunk","name":null,"id":"run-8a1ba257-cd7f-4559-892a-2d54ab369b48","example":false,"tool_calls":[],"invalid_tool_calls":[],"usage_metadata":null,"tool_call_chunks":[]}
 
 event: data
-data: ""
+data: {"content":"请提供您希望修改的文本来吧。","additional_kwargs":{},"response_metadata":{},"type":"AIMessageChunk","name":null,"id":"run-8a1ba257-cd7f-4559-892a-2d54ab369b48","example":false,"tool_calls":[],"invalid_tool_calls":[],"usage_metadata":null,"tool_call_chunks":[]}
+
+event: data
+data: {"content":"","additional_kwargs":{},"response_metadata":{},"type":"AIMessageChunk","name":null,"id":"run-8a1ba257-cd7f-4559-892a-2d54ab369b48","example":false,"tool_calls":[],"invalid_tool_calls":[],"usage_metadata":null,"tool_call_chunks":[]}
 
 event: end
 
 ```
 
-#### 摘要invoke
+### 摘要invoke
 
-```bash
+```json
 
-/api/langserve/abstract/invoke
+POST /api/langserve/abstract/invoke
 
 # POST请求体
 {
@@ -222,11 +225,11 @@ event: end
 
 ```
 
-#### 摘要stream
+### 摘要stream
 
-```bash
+```json
 
-/api/langserve/abstract/stream
+POST /api/langserve/abstract/stream
 
 # POST请求体
 {
@@ -238,15 +241,15 @@ event: end
   "kwargs": {}
 }
 
-# 返回 200 同其他stream接口
+# 返回 200 同润色stream接口
 
 ```
 
-#### 病句改写invoke
+### 病句改写invoke
 
-```bash
+```json
 
-/api/langserve/fix/invoke
+POST /api/langserve/fix/invoke
 
 # POST请求体
 {
@@ -274,11 +277,11 @@ event: end
 
 ```
 
-#### 病句改写stream
+### 病句改写stream
 
-```bash
+```json
 
-/api/langserve/fix/stream
+POST /api/langserve/fix/stream
 
 # POST请求体
 {
@@ -289,15 +292,15 @@ event: end
   "kwargs": {}
 }
 
-# 返回 200 同其他stream接口
+# 返回 200 同润色stream接口
 
 ```
 
-#### 翻译invoke
+### 翻译invoke
 
-```bash
+```json
 
-/api/langserve/translate/invoke
+POST /api/langserve/translate/invoke
 
 # POST请求体
 {
@@ -326,11 +329,11 @@ event: end
 
 ```
 
-#### 翻译stream
+### 翻译stream
 
-```bash
+```json
 
-/api/langserve/translate/stream
+POST /api/langserve/translate/stream
 
 # POST请求体
 {
@@ -342,13 +345,13 @@ event: end
   "kwargs": {}
 }
 
-# 返回 200 同其他stream接口
+# 返回 200 同润色stream接口
 
 ```
 
-### 流式对话
+## 流式对话
 
-#### 使用示例
+### 使用示例
 
 ```js
 import { fetchEventSource } from '@microsoft/fetch-event-source';
@@ -369,15 +372,15 @@ const sendMessage = async () => {
 }
 ```
 
-### 有记忆对话
+## 有记忆对话
 
 需要安装[Redis](https://redis.io/downloads)
 
-#### 请求
+### 请求
 
 在浏览器中存入名为`user_id`的cookie
 
-```http
+```json
 POST /api/langserve/chat_with_history/invoke 
 POST /api/langserve/chat_with_history/stream
 content-type: application/json
@@ -397,9 +400,9 @@ content-type: application/json
 
 ```
 
-### 总结文档
+## 总结文档
 
-```http
+```json
 POST /api/langserve/file_summary/invoke
 {
   "input": {
@@ -407,5 +410,44 @@ POST /api/langserve/file_summary/invoke
   },
   "config": {},
   "kwargs": {}
+}
+```
+
+## 提取格式
+
+```json
+POST /api/langserve/format/invoke
+{
+  "input": {
+    "query": "正文用宋体小四，标题一用黑体小三，标题二用黑体小四，标题三用黑体小五"
+  },
+  "config": {},
+  "kwargs": {}
+}
+
+# Response
+{
+  "output": [
+    {
+      "正文字体": "宋体",
+      "正文字体大小": "小四",
+      "标题1": {
+        "字体": "黑体",
+        "字体大小": "小三"
+      },
+      "标题2": {
+        "字体": "黑体",
+        "字体大小": "小四"
+      },
+      "标题3": {
+        "字体": "黑体",
+        "字体大小": "小五"
+      }
+    }
+  ],
+  "metadata": {
+    "run_id": "c648e664-b234-48dc-83cf-45f3b412e0c1",
+    "feedback_tokens": []
+  }
 }
 ```
