@@ -451,3 +451,20 @@ POST /api/langserve/format/invoke
   }
 }
 ```
+
+## OCR
+
+```json
+POST http://127.0.0.1:8000/api/ocr/uploadimg
+
+
+{
+  "code": 200,
+  "data": [
+    "文字1",
+    "文字1",
+    ...
+  ],
+  "msg": "success"
+}
+```
