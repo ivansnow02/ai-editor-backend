@@ -37,7 +37,7 @@ router = APIRouter(
 )
 
 
-completion_chain = completion_prompt | model
+completion_chain = completion_prompt | cmodel
 
 
 add_routes(
