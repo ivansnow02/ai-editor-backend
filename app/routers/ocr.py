@@ -1,15 +1,18 @@
 import hashlib
+import io
 import os
 import shutil
+from pathlib import Path
 from tempfile import NamedTemporaryFile
 from unittest import result
-from fastapi import APIRouter,File,  UploadFile
-from pathlib import Path
-from ..main import ocrModel
-import io
+
 import numpy as np
 from PIL import Image
+from fastapi import APIRouter, File, UploadFile
+
+from . import ocrModel
 from ..common.result import Res
+
 router = APIRouter(
     prefix="/api/ocr",
     tags=["ocr"],

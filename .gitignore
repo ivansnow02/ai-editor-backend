@@ -16,3 +16,6 @@ build/
 .env
 .flaskenv
 *.ipynb
+
+.conda/
+.idea/
