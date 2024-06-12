@@ -4,7 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.log import init_log
 from app.routers import langserve, chat_with_history, format, ocr
-from config import settings
 class Server:
     def __init__(self):
         init_log()
