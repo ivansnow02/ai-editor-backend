@@ -15,8 +15,8 @@ from langchain_community.document_loaders.parsers.txt import TextParser
 from langchain_community.document_loaders.parsers.html import BS4HTMLParser
 from langchain_community.document_loaders.parsers.generic import MimeTypeBasedParser
 
-from ..generate.llm import ChatModel, LlmModel
-from app.generate.prompts import (
+
+from app.utils import (
     abstract_prompt,
     completion_prompt,
     fix_prompt,
@@ -24,6 +24,8 @@ from app.generate.prompts import (
     translate_prompt,
     summary_prompt,
     refine_prompt,
+    LlmModel,
+    ChatModel,
 )
 
 

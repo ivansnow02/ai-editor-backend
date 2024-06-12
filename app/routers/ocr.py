@@ -1,28 +1,18 @@
 import hashlib
 import io
 import os
-import shutil
-from pathlib import Path
-from tempfile import NamedTemporaryFile
-from typing import Annotated
-from unittest import result
 
-import numpy as np
 from PIL import Image
 from fastapi import APIRouter, File, Query, UploadFile
-from regex import D
-import requests
 from typing import Union
 
-from . import ocrModel
-from ..common.result import Res
+from app.utils import Res, ocrModel
 
 router = APIRouter(
     prefix="/api/img",
     tags=["img"],
     responses={404: {"description": "Not found"}},
 )
-
 
 
 @router.post(path="/upload")
@@ -53,4 +43,3 @@ async def ocrImg(img_path: Union[str, None] = Query(
     texts = [item[1][0] for res in result for item in res]
 
     return Res(data=texts)
-

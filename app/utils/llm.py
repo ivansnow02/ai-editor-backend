@@ -1,4 +1,14 @@
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from erniebot_agent.extensions.langchain.llms import ErnieBot
+from erniebot_agent.extensions.langchain.chat_models import ErnieBotChat
+
+def LlmModel(model: str = "ernie-speed"):
+    return ErnieBot(model=model)
+
+
+
+def ChatModel(model: str = "ernie-speed"):
+    return ErnieBotChat(model=model)
 
 
 completion_prompt = ChatPromptTemplate.from_messages(

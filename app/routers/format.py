@@ -5,7 +5,7 @@ from langserve import add_routes
 import re
 import json
 from langchain_core.messages import AIMessage
-from ..generate.llm import ChatModel
+from app.utils import ChatModel
 
 
 schema = """

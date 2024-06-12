@@ -19,11 +19,20 @@
 - [ ] 语音识别
 - [ ] RAG对话
 
-
 ## 安装
 
 ```bash
 pip install -r requirements.txt
+
+or
+
+conda create -n ai-editor --file req.txt 
+
+or 
+
+conda env create -f environment.yaml -p /你的项目根目录/.conda
+
+
 ```
 
 ## 使用
@@ -37,8 +46,11 @@ $env:EB_ACCESS_TOKEN = "your_access_token" # powershell
 export AISTUDIO_ACCESS_TOKEN = "your_access_token" # linux
 $env:AISTUDIO_ACCESS_TOKEN = "your_access_token" # powershell
 
+export ENV_FOR_DYNACONF = 'development' # 环境切换
+$env:ENV_FOR_DYNACONF = 'development' # powershell
+
 # 运行
-uvicorn app.main:app --reload
+python run.py
 ```
 
 ## [接口文档](/docs/api.md)

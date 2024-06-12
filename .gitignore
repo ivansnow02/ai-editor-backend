@@ -21,3 +21,5 @@ build/
 .idea/
 
 static/*
+# Ignore dynaconf secret files
+.secrets.*

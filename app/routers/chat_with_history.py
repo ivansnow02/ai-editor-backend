@@ -15,7 +15,7 @@ from fastapi import APIRouter
 
 from langserve import add_routes
 
-from ..generate.llm import ChatModel
+from app.utils import ChatModel
 
 
 def _is_valid_identifier(value: str) -> bool:

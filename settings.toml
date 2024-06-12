@@ -1,0 +1,10 @@
+[development]
+    LOG_LEVEL='DEBUG'
+    HOST='localhost'
+    PORT=8000
+    RELOAD='True'
+
+
+[production]
+    LOG_LEVEL='INFO'
+    RELOAD='False'
