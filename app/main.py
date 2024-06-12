@@ -2,6 +2,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
 app = FastAPI()
@@ -21,7 +22,7 @@ app.include_router(langserve.router)
 app.include_router(chat_with_history.router)
 app.include_router(format.router)
 app.include_router(ocr.router)
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":
     uvicorn.run(app)

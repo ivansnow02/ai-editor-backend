@@ -397,9 +397,9 @@ POST /api/langserve/format/invoke
 ## OCR
 
 ```json
-POST http://127.0.0.1:8000/api/ocr/uploadimg
+GET http://127.0.0.1:8000/api/img/ocr?img_path=static%2F4517285d30d12c978510261c986ec773.png
 
-
+# Response
 {
   "code": 200,
   "data": [
@@ -407,6 +407,23 @@ POST http://127.0.0.1:8000/api/ocr/uploadimg
     "文字1",
     ...
   ],
+  "msg": "success"
+}
+```
+
+## 上传图片
+
+```json
+POST /api/img/upload
+{
+  "file": "图片文件"
+}
+# Response
+{
+  "code": 200,
+  "data": {
+    "url": "图片url"
+  },
   "msg": "success"
 }
 ```

@@ -4,37 +4,53 @@ import os
 import shutil
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from typing import Annotated
 from unittest import result
 
 import numpy as np
 from PIL import Image
-from fastapi import APIRouter, File, UploadFile
+from fastapi import APIRouter, File, Query, UploadFile
+from regex import D
+import requests
+from typing import Union
 
 from . import ocrModel
 from ..common.result import Res
 
 router = APIRouter(
-    prefix="/api/ocr",
-    tags=["ocr"],
+    prefix="/api/img",
+    tags=["img"],
     responses={404: {"description": "Not found"}},
 )
 
 
-@router.post(path="/uploadimg")
-async def uploadimg(file: UploadFile = File(...)):
-    try:
-        if file is None:
-            return {"error": "file is None"}
 
-        # Read the file as bytes
-        file_bytes = await file.read()
+@router.post(path="/upload")
+async def uploadImg(file: UploadFile = File(...)):
+    # 保存图片
+    img = Image.open(io.BytesIO(await file.read()))
+    dir_path = "static/"
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    if file.filename is None:
+        return Res(code=400, msg="file name is None")
+    img_path = dir_path+f"{hashlib.md5(file.filename.encode()).hexdigest()}.png"
+    img.save(img_path)
 
-        # Convert the bytes to a numpy array
-        image = Image.open(io.BytesIO(file_bytes))
-        img_array = np.array(image)
+    return Res(data={'url':img_path})
 
-        result = ocrModel.ocr(img_array, cls=True)
-        texts = [item[1][0] for res in result for item in res]
-    finally:
-        file.file.close()
+
+@router.get(path="/ocr/")
+async def ocrImg(img_path: Union[str, None] = Query(
+    default=None, title="图片路径", description="图片路径", example="static/xxx.png", alias="img_path",pattern=r"static/.*\.png"
+)):
+    if img_path is None:
+        return Res(code=400, msg="img_path is None")
+    # file_name = img_path.split("/")[-1]
+    # fpath = './../static/' + file_name
+    print(img_path)
+    result = ocrModel.ocr(img=img_path, cls=True)
+    texts = [item[1][0] for res in result for item in res]
+
     return Res(data=texts)
+

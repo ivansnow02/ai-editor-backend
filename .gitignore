@@ -19,3 +19,5 @@ build/
 
 .conda/
 .idea/
+
+static/*
