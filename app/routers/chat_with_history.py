@@ -1,21 +1,17 @@
-from erniebot_agent.extensions.langchain.llms import ErnieBot
 import re
 from typing import Any, Callable, Dict
 
+from fastapi import APIRouter
 from fastapi import HTTPException, Request
 from langchain_community.chat_message_histories import RedisChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import ConfigurableFieldSpec
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from typing_extensions import TypedDict
-from fastapi import APIRouter
-
-
-
 from langserve import add_routes
+from typing_extensions import TypedDict
 
-from app.utils import ChatModel
+from app.utils.llm import ChatModel
 
 
 def _is_valid_identifier(value: str) -> bool:

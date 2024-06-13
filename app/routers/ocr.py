@@ -1,12 +1,13 @@
 import hashlib
 import io
 import os
+from typing import Union
 
 from PIL import Image
 from fastapi import APIRouter, File, Query, UploadFile
-from typing import Union
 
-from app.utils import Res, ocrModel
+from app.utils.ocr import init_ocr
+from app.utils.result import Res
 
 router = APIRouter(
     prefix="/api/img",
@@ -14,9 +15,11 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+ocrModel = init_ocr()
+
 
 @router.post(path="/upload")
-async def uploadImg(file: UploadFile = File(...)):
+async def upload_img(file: UploadFile = File(...)):
     # 保存图片
     img = Image.open(io.BytesIO(await file.read()))
     dir_path = "static/"
@@ -24,15 +27,16 @@ async def uploadImg(file: UploadFile = File(...)):
         os.makedirs(dir_path)
     if file.filename is None:
         return Res(code=400, msg="file name is None")
-    img_path = dir_path+f"{hashlib.md5(file.filename.encode()).hexdigest()}.png"
+    img_path = dir_path + f"{hashlib.md5(file.filename.encode()).hexdigest()}.png"
     img.save(img_path)
 
-    return Res(data={'url':img_path})
+    return Res(data={'url': img_path})
 
 
 @router.get(path="/ocr/")
-async def ocrImg(img_path: Union[str, None] = Query(
-    default=None, title="图片路径", description="图片路径", example="static/xxx.png", alias="img_path",pattern=r"static/.*\.png"
+async def ocr_img(img_path: Union[str, None] = Query(
+    default=None, title="图片路径", description="图片路径", example="static/xxx.png", alias="img_path",
+    pattern=r"static/.*\.png"
 )):
     if img_path is None:
         return Res(code=400, msg="img_path is None")

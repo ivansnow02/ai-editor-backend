@@ -1,3 +1,3 @@
-from .main import Server
+from app.log import init_log
 
-__all__ = ["Server"]
+init_log()

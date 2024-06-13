@@ -1,10 +1,12 @@
-import uvicorn
-from app import Server
-from config import settings
+#!/usr/bin/env python3
+
+import subprocess
+
 import click
 
-server = Server()
-app = server.app
+from config import settings
+
+
 @click.command()
 @click.option(
     "-h", "--host", show_default=True, help=f"Host IP. Default: {settings.HOST}"
@@ -23,15 +25,15 @@ def serve(host, port, level):
     for name, value in kwargs.items():
         if value:
             settings.set(name, value)
+    subprocess.run(["python", "-m", "app.main"])
 
-    
-    
-    uvicorn.run(
-        app="__main__:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=settings.RELOAD,
-    )
+
+@click.group()
+def cli():
+    pass
+
+
+cli.add_command(serve)
 
 if __name__ == "__main__":
-    serve()
+    cli()

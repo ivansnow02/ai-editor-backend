@@ -1,22 +1,22 @@
 import base64
 from typing import List
+
+import magic
 from fastapi import APIRouter
-from langchain_core.documents.base import Document
-from langserve import CustomUserType, add_routes
 from langchain.chains.summarize import load_summarize_chain
 from langchain.text_splitter import CharacterTextSplitter
-from langchain_core.runnables.base import RunnableLambda
-import magic
-from langchain_core.pydantic_v1 import Field
-from langchain_core.document_loaders import Blob
-from langchain_community.document_loaders.parsers.pdf import PDFMinerParser
-from langchain_community.document_loaders.parsers.msword import MsWordParser
-from langchain_community.document_loaders.parsers.txt import TextParser
-from langchain_community.document_loaders.parsers.html import BS4HTMLParser
 from langchain_community.document_loaders.parsers.generic import MimeTypeBasedParser
+from langchain_community.document_loaders.parsers.html import BS4HTMLParser
+from langchain_community.document_loaders.parsers.msword import MsWordParser
+from langchain_community.document_loaders.parsers.pdf import PDFMinerParser
+from langchain_community.document_loaders.parsers.txt import TextParser
+from langchain_core.document_loaders import Blob
+from langchain_core.documents.base import Document
+from langchain_core.pydantic_v1 import Field
+from langchain_core.runnables.base import RunnableLambda
+from langserve import CustomUserType, add_routes
 
-
-from app.utils import (
+from app.utils.llm import (
     abstract_prompt,
     completion_prompt,
     fix_prompt,
@@ -27,7 +27,6 @@ from app.utils import (
     LlmModel,
     ChatModel,
 )
-
 
 model = LlmModel()
 cmodel = ChatModel()

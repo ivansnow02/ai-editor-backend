@@ -1,12 +1,13 @@
+import json
+import re
 from typing import List
+
 from fastapi import APIRouter
+from langchain_core.messages import AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langserve import add_routes
-import re
-import json
-from langchain_core.messages import AIMessage
-from app.utils import ChatModel
 
+from app.utils.llm import ChatModel
 
 schema = """
 {

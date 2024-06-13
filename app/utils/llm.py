@@ -1,10 +1,10 @@
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
-from erniebot_agent.extensions.langchain.llms import ErnieBot
 from erniebot_agent.extensions.langchain.chat_models import ErnieBotChat
+from erniebot_agent.extensions.langchain.llms import ErnieBot
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+
 
 def LlmModel(model: str = "ernie-speed"):
     return ErnieBot(model=model)
-
 
 
 def ChatModel(model: str = "ernie-speed"):
@@ -51,7 +51,6 @@ polish_prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-
 fix_prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -61,7 +60,6 @@ fix_prompt = ChatPromptTemplate.from_messages(
         ("user", "{human_input}"),
     ]
 )
-
 
 refine_template = (
     "你的工作是编写最终摘要\n"

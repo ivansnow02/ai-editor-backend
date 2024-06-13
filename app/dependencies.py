@@ -1,9 +1,12 @@
-from fastapi import Request
-from sqlalchemy.orm import Session
+from .db import SessionLocal
 
 
-def get_db(request: Request) -> Session:
-    return request.state.db
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 class CommonQueryParams:

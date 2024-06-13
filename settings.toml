@@ -2,7 +2,7 @@
     LOG_LEVEL='DEBUG'
     HOST='localhost'
     PORT=8000
-    RELOAD='True'
+RELOAD = 'False'
 
 
 [production]

@@ -1,4 +1,5 @@
-import paddle
 from paddleocr import PaddleOCR
 
-ocrModel = PaddleOCR(use_angle_cls=True, lang="ch")
+
+def init_ocr() -> PaddleOCR:
+    return PaddleOCR(use_angle_cls=True, lang="ch")
