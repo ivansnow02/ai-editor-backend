@@ -17,15 +17,15 @@ from langchain_core.runnables.base import RunnableLambda
 from langserve import CustomUserType, add_routes
 
 from app.utils.llm import (
+    ChatModel,
+    LlmModel,
     abstract_prompt,
     completion_prompt,
     fix_prompt,
     polish_prompt,
-    translate_prompt,
-    summary_prompt,
     refine_prompt,
-    LlmModel,
-    ChatModel,
+    summary_prompt,
+    translate_prompt,
 )
 
 model = LlmModel()

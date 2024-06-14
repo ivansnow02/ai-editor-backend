@@ -1,6 +1,15 @@
 from sqlmodel import Field, SQLModel
 
 
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(SQLModel):
+    username: str | None = None
+
+
 class UserBase(SQLModel):
     username: str = Field(index=True)
     email: str = Field(index=True)
@@ -29,6 +38,7 @@ class UserUpdate(SQLModel):
 
 class UserPublic(UserBase):
     id: int
+
 
 # class Image(SQLModel, table=True):
 

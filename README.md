@@ -4,7 +4,6 @@
 
 基于大小模型的文本编辑器后端，使用 FastAPI 框架实现。
 
-
 ## 功能特性
 
 - [x] 摘要
@@ -25,10 +24,6 @@
 ```bash
 pip install -r requirements.txt
 
-or
-
-conda create -n ai-editor --file req.txt 
-
 or 
 
 conda env create -f environment.yaml -p /你的项目根目录/.conda
@@ -39,16 +34,17 @@ conda env create -f environment.yaml -p /你的项目根目录/.conda
 ## 使用
 
 ```bash
-# 使用文心一言
-export EB_AGENT_ACCESS_TOKEN = "your_access_token" # linux
-$env:EB_ACCESS_TOKEN = "your_access_token" # powershell
-
 # 使用langserve
 export AISTUDIO_ACCESS_TOKEN = "your_access_token" # linux
-$env:AISTUDIO_ACCESS_TOKEN = "your_access_token" # powershell
+
+# OAuth2变量
+# 可以使用 openssl rand -hex 32 生成
+export SECRET_KEY=''
+# 可以使用 openssl rand -hex 10 生成
+export SALT=''
 
 export ENV_FOR_DYNACONF = 'development' # 环境切换
-$env:ENV_FOR_DYNACONF = 'development' # powershell
+
 
 ```
 
@@ -66,11 +62,22 @@ PASSWORD = '你的密码'
 
 [development.DATABASE.QUERY]
 client_encoding = 'utf8'
+
+[DEVELOPMENT.EMAIL]
+SMTP_SERVER = ""
+ADDR = ""
+PWD = ""
+
+[DEVELOPMENT.REDIS]
+HOST = 'localhost'
+PORT = 6379
+DB = 0
+
 ```
 
 ``` bash
 # 运行
-python run.py
+python run.py serve
 ```
 
 ## [接口文档](/docs/api.md)
