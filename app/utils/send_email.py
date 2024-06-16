@@ -11,7 +11,7 @@ smtp_server = settings.EMAIL.get("SMTP_SERVER")
 
 
 def generate_code():
-    return "".join(random.choices(string.digits, 6))
+    return "".join(random.choices(string.digits, k=6))
 
 
 def generate_email(to_addr) -> str:

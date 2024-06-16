@@ -5,8 +5,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
 from app import crud
-from app.dependencies import get_db
+from app.dependencies import get_db, get_redis
 from app.models import Token, UserCreate, UserPublic
+from app.utils import send_email
 from app.utils.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     authenticate_user,
@@ -40,7 +41,10 @@ async def login_for_access_token(
 
 @router.post("/register")
 async def register(
-    obj_in: UserCreate, session: Session = Depends(dependency=get_db)
+    obj_in: UserCreate,
+    session: Session = Depends(dependency=get_db),
+    code: str = None,
+    r=Depends(get_redis),
 ) -> Res:
     email = obj_in.email
     if crud.get_user_by_email(session=session, email=email):
@@ -53,6 +57,32 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
         )
-    data: UserPublic = crud.create_user(session=session, obj_in=obj_in)
+    if not r.get(email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Code expired",
+        )
+    if code != r.get(email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Code error",
+        )
 
+    data: UserPublic = crud.create_user(session=session, obj_in=obj_in)
+    r.delete(email)
     return Res(data=data.model_dump())
+
+
+@router.post("/send_code")
+async def send_code(
+    email: str, r=Depends(get_redis), session: Session = Depends(get_db)
+) -> Res:
+    email = email.strip()
+    if crud.get_user_by_email(email=email, session=session):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered",
+        )
+    code = send_email.generate_email(email)
+    r.set(email, code, ex=300)
+    return Res(msg="Send success")
