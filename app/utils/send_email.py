@@ -18,7 +18,7 @@ def generate_email(to_addr) -> str:
     code = generate_code()
     head = "邮箱验证码"
     """标题"""
-    text = f"您的验证码{code}，该验证码5分钟内有效，请勿泄漏于他人！"
+    text = f"您的验证码{code}，该验证码20分钟内有效，请勿泄漏于他人！"
     """正文"""
     send(to_addr, head, text)
     return code

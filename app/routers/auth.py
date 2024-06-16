@@ -62,7 +62,9 @@ async def register(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Code expired",
         )
-    if code != r.get(email):
+    print(r.get(email))
+    print(code)
+    if code != r.get(email).decode('utf-8'):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Code error",
@@ -84,5 +86,5 @@ async def send_code(
             detail="Email already registered",
         )
     code = send_email.generate_email(email)
-    r.set(email, code, ex=300)
+    r.set(email, code, ex=1200)
     return Res(msg="Send success")
