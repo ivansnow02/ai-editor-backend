@@ -3,7 +3,7 @@ from typing import Sequence
 from fastapi import HTTPException
 from sqlmodel import Session, select
 
-from .models import User, UserCreate, UserPublic, UserUpdate
+from .models import ImageModel, ImagePublic, User, UserCreate, UserPublic, UserUpdate
 from .utils.auth import get_password_hash
 
 
@@ -66,3 +66,19 @@ def get_user_by_username(session: Session, username: str) -> User | None:
 def get_user_by_email(session: Session, email: str) -> User | None:
     user = session.query(User).filter(User.email == email).first()
     return user
+
+
+def create_img(session: Session, img: ImageModel) -> ImagePublic:
+    session.add(img)
+    session.commit()
+    session.refresh(img)
+    url = "/api/img/" + str(img.id)
+    img_public = ImagePublic(id=img.id, url=url)
+    return img_public
+
+
+def get_img(session: Session, pk: int) -> ImageModel:
+    img: ImageModel | None = session.get(ImageModel, pk)
+    if not img:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return img
