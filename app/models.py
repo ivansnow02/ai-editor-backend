@@ -28,6 +28,11 @@ class UserCreate(UserBase):
     password: str
 
 
+class EmailCode(SQLModel):
+    email: str
+    code: str
+
+
 class UserUpdate(SQLModel):
     username: str | None = None
     email: str | None = None

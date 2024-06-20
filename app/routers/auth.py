@@ -6,7 +6,7 @@ from sqlmodel import Session
 
 from app import crud
 from app.dependencies import get_db, get_redis
-from app.models import Token, UserCreate, UserPublic
+from app.models import EmailCode, Token, UserCreate, UserPublic
 from app.utils import send_email
 from app.utils.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -42,8 +42,8 @@ async def login_for_access_token(
 @router.post("/register")
 async def register(
     obj_in: UserCreate,
+    email_code: EmailCode,
     session: Session = Depends(dependency=get_db),
-    code: str = None,
     r=Depends(get_redis),
 ) -> Res:
     email = obj_in.email
@@ -63,23 +63,22 @@ async def register(
             detail="Code expired",
         )
     print(r.get(email))
-    print(code)
-    if code != r.get(email).decode('utf-8'):
+    if email_code.code != r.get(email).decode("utf-8"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Code error",
         )
 
-    data: UserPublic = crud.create_user(session=session, obj_in=obj_in)
+    data: UserPublic = crud.create_user(session=session, obj_in=obj_in.model_dump())
     r.delete(email)
     return Res(data=data.model_dump())
 
 
 @router.post("/send_code")
 async def send_code(
-    email: str, r=Depends(get_redis), session: Session = Depends(get_db)
+    email_code: EmailCode, r=Depends(get_redis), session: Session = Depends(get_db)
 ) -> Res:
-    email = email.strip()
+    email = email_code.email
     if crud.get_user_by_email(email=email, session=session):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
