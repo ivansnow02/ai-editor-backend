@@ -35,7 +35,7 @@ conda env create -f environment.yaml -p /你的项目根目录/.conda
 
 ```bash
 # 使用langserve
-export AISTUDIO_ACCESS_TOKEN = "your_access_token" # linux
+export AISTUDIO_ACCESS_TOKEN="your_access_token" # linux
 
 # OAuth2变量
 # 可以使用 openssl rand -hex 32 生成
@@ -43,7 +43,7 @@ export SECRET_KEY=''
 # 可以使用 openssl rand -hex 10 生成
 export SALT=''
 
-export ENV_FOR_DYNACONF = 'development' # 环境切换
+export ENV_FOR_DYNACONF='DEVELOPMENT' # 环境切换
 
 
 ```
@@ -52,7 +52,7 @@ export ENV_FOR_DYNACONF = 'development' # 环境切换
 其他配置请参考[SQLAlchemy配置](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls)
 
 ```toml
-[development.DATABASE]
+[DEVELOPMENT.DATABASE]
 DRIVER = 'postgresql+psycopg'
 HOST = 'localhost'
 PORT = 5432
@@ -60,7 +60,7 @@ NAME = 'ai_editor_dev'
 USERNAME = 'postgres'
 PASSWORD = '你的密码'
 
-[development.DATABASE.QUERY]
+[DEVELOPMENT.DATABASE.QUERY]
 client_encoding = 'utf8'
 
 [DEVELOPMENT.EMAIL]
