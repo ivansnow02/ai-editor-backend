@@ -28,6 +28,16 @@ from app.utils.llm import (
     translate_prompt,
 )
 
+# async def _response_formatter_streaming(input_stream):
+#     async for msg in input_stream:
+#         c = ""
+#         c += msg.content
+#         content = re.sub(
+#             r"```(.*?)\n(.*?)```", r"<pre><code lang=\1>\2</code></pre>", c
+#         )
+#         yield content
+
+
 model = LlmModel()
 cmodel = ChatModel()
 
@@ -37,9 +47,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-
 completion_chain = completion_prompt | cmodel
-
 
 add_routes(
     app=router,
@@ -47,7 +55,6 @@ add_routes(
     path="/completion",
     enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
-
 
 fix_chain = fix_prompt | cmodel
 
@@ -76,7 +83,6 @@ add_routes(
     enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
 
-
 abstract_chain = abstract_prompt | cmodel
 
 add_routes(
@@ -85,7 +91,6 @@ add_routes(
     path="/abstract",
     enabled_endpoints=["invoke", "stream", "playground", "stream_log"],
 )
-
 
 # Configure the parsers that you want to use per mime-type!
 HANDLERS = {
@@ -103,11 +108,9 @@ MIMETYPE_BASED_PARSER = MimeTypeBasedParser(
 
 mime = magic.Magic(mime=True)
 
-
 text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
     chunk_size=4000, chunk_overlap=0
 )
-
 
 summary_chain = load_summarize_chain(
     llm=model,

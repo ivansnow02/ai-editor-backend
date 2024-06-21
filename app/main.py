@@ -22,7 +22,7 @@ app.add_middleware(
 
 app.include_router(
     langserve.router,
-    dependencies=[Depends(get_current_user)],
+    # dependencies=[Depends(get_current_user)],
 )
 app.include_router(
     chat_with_history.router,
