@@ -1,4 +1,13 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
+
+
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(SQLModel):
+    username: str | None = None
 
 
 class UserBase(SQLModel):
@@ -12,11 +21,16 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str = Field()
 
-    # images: list["Image"] = Relationship(back_populates="user")
+    images: list["ImageModel"] = Relationship(back_populates="user")
 
 
 class UserCreate(UserBase):
     password: str
+
+
+class EmailCode(SQLModel):
+    email: str
+    code: str
 
 
 class UserUpdate(SQLModel):
@@ -30,10 +44,14 @@ class UserUpdate(SQLModel):
 class UserPublic(UserBase):
     id: int
 
-# class Image(SQLModel, table=True):
 
-#     id: int | None = Field(default=None, primary_key=True)
-#     path: str = Field(index=True)
-#     despcription: str | None = Field(default=None)
-#     owner_id: int = Field(foreign_key="users.id")
-#     owner: User = Relationship(back_populates="images")
+class ImageModel(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    path: str = Field(index=True)
+    user_id: int = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="images")
+
+
+class ImagePublic(SQLModel):
+    id: int
+    url: str

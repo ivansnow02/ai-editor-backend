@@ -1,11 +1,14 @@
 import hashlib
 import io
 import os
-from typing import Union
 
 from PIL import Image
-from fastapi import APIRouter, File, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Path, UploadFile
+from sqlmodel import Session
 
+from app import crud
+from app.dependencies import get_current_user, get_db
+from app.models import ImageModel, UserPublic
 from app.utils.ocr import init_ocr
 from app.utils.result import Res
 
@@ -19,7 +22,11 @@ ocrModel = init_ocr()
 
 
 @router.post(path="/upload")
-async def upload_img(file: UploadFile = File(...)):
+async def upload_img(
+    session: Session = Depends(dependency=get_db),
+    file: UploadFile = File(...),
+    user: UserPublic = Depends(get_current_user),
+):
     # 保存图片
     img = Image.open(io.BytesIO(await file.read()))
     dir_path = "static/"
@@ -30,14 +37,43 @@ async def upload_img(file: UploadFile = File(...)):
     img_path = dir_path + f"{hashlib.md5(file.filename.encode()).hexdigest()}.png"
     img.save(img_path)
 
-    return Res(data={'url': img_path})
+    image = crud.create_img(
+        session=session, img=ImageModel(path=img_path, user_id=user.id)
+    )
+
+    return Res(data=image.model_dump())
 
 
-@router.get(path="/ocr/")
-async def ocr_img(img_path: Union[str, None] = Query(
-    default=None, title="图片路径", description="图片路径", example="static/xxx.png", alias="img_path",
-    pattern=r"static/.*\.png"
-)):
+@router.get(path="/{img_id}")
+async def get_img(
+    session: Session = Depends(dependency=get_db),
+    img_id: int = Path(
+        ..., title="图片id", description="图片id", example=1, alias="img_id"
+    ),
+    user: UserPublic = Depends(get_current_user),
+):
+    image = crud.get_img(session=session, pk=img_id)
+    if image is None:
+        return Res(code=400, msg="img is None")
+    if image.user_id != user.id:
+        return Res(code=400, msg="img is not belong to you")
+    return Res(data=image.model_dump())
+
+
+@router.get(path="/ocr/{img_id}")
+async def ocr_img(
+    img_id: int = Path(
+        ..., title="图片id", description="图片id", example=1, alias="img_id"
+    ),
+    session: Session = Depends(dependency=get_db),
+    user: UserPublic = Depends(get_current_user),
+):
+    img = crud.get_img(session=session, pk=img_id)
+    if img is None:
+        return Res(code=400, msg="img is None")
+    if img.user_id != user.id:
+        return Res(code=400, msg="img is not belong to you")
+    img_path = img.path
     if img_path is None:
         return Res(code=400, msg="img_path is None")
     # file_name = img_path.split("/")[-1]

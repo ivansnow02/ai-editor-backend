@@ -1,11 +1,12 @@
 import uvicorn
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlmodel import SQLModel
 
 from app.db import engine
-from app.routers import langserve, chat_with_history, format, ocr, user
+from app.dependencies import get_current_user
+from app.routers import auth, chat_with_history, format, langserve, ocr, user
 from config import settings
 
 SQLModel.metadata.create_all(engine)
@@ -19,11 +20,27 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(langserve.router)
-app.include_router(chat_with_history.router)
-app.include_router(format.router)
-app.include_router(ocr.router)
-app.include_router(user.router)
+app.include_router(
+    langserve.router,
+    # dependencies=[Depends(get_current_user)],
+)
+app.include_router(
+    chat_with_history.router,
+    dependencies=[Depends(get_current_user)],
+)
+app.include_router(
+    format.router,
+    dependencies=[Depends(get_current_user)],
+)
+app.include_router(
+    ocr.router,
+    dependencies=[Depends(get_current_user)],
+)
+app.include_router(
+    user.router,
+    dependencies=[Depends(get_current_user)],
+)
+app.include_router(auth.router)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
