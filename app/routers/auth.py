@@ -69,7 +69,7 @@ async def register(
             detail="Code error",
         )
 
-    data: UserPublic = crud.create_user(session=session, obj_in=obj_in.model_dump())
+    data: UserPublic = crud.create_user(session=session, obj_in=obj_in)
     r.delete(email)
     return Res(data=data.model_dump())
 
