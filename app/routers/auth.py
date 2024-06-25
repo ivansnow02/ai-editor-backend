@@ -2,10 +2,9 @@ from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session
 
 from app import crud
-from app.dependencies import get_db, get_redis
+from app.dependencies import get_redis
 from app.models import EmailCode, Token, UserCreate, UserPublic
 from app.utils import send_email
 from app.utils.auth import (
@@ -21,9 +20,8 @@ router = APIRouter(tags=["auth"], responses={404: {"description": "Not found"}})
 @router.post("/token")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
-    session: Session = Depends(dependency=get_db),
 ) -> Token:
-    user = crud.get_user_by_username(session=session, username=form_data.username)
+    user = crud.get_user_by_username(username=form_data.username)
     user = authenticate_user(user, form_data.password)
     if not user:
         raise HTTPException(
@@ -43,16 +41,15 @@ async def login_for_access_token(
 async def register(
     obj_in: UserCreate,
     email_code: EmailCode,
-    session: Session = Depends(dependency=get_db),
     r=Depends(get_redis),
 ) -> Res:
     email = obj_in.email
-    if crud.get_user_by_email(session=session, email=email):
+    if crud.get_user_by_email(email=email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered",
         )
-    if crud.get_user_by_username(session=session, username=obj_in.username):
+    if crud.get_user_by_username(username=obj_in.username):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username already registered",
@@ -69,17 +66,15 @@ async def register(
             detail="Code error",
         )
 
-    data: UserPublic = crud.create_user(session=session, obj_in=obj_in)
+    data: UserPublic = crud.create_user(obj_in=obj_in)
     r.delete(email)
     return Res(data=data.model_dump())
 
 
 @router.post("/send_code")
-async def send_code(
-    email_code: EmailCode, r=Depends(get_redis), session: Session = Depends(get_db)
-) -> Res:
+async def send_code(email_code: EmailCode, r=Depends(get_redis)) -> Res:
     email = email_code.email
-    if crud.get_user_by_email(email=email, session=session):
+    if crud.get_user_by_email(email=email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered",

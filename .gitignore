@@ -24,3 +24,4 @@ static/*
 # Ignore dynaconf secret files
 .secrets.*
 settings.local.toml
+/dump.rdb

@@ -2,11 +2,9 @@ import redis
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
-from sqlmodel import Session
 
 from config import settings
 from . import crud
-from .db import SessionLocal
 from .models import TokenData, UserPublic
 from .utils.auth import ALGORITHM, SECRET_KEY
 
@@ -25,14 +23,6 @@ def get_redis():
         r.close()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 class CommonQueryParams:
     def __init__(self, offset: int = 1, limit: int = 10):
         self.offset = offset - 1
@@ -44,9 +34,7 @@ class CommonQueryParams:
             self.limit = 10
 
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme), session: Session = Depends(dependency=get_db)
-) -> UserPublic:
+def get_current_user(token: str = Depends(oauth2_scheme)) -> UserPublic:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="无法验证凭据",
@@ -60,7 +48,7 @@ def get_current_user(
         token_data = TokenData(username=username)
     except jwt.JWTError:
         raise credentials_exception
-    user = crud.get_user_by_username(username=token_data.username, session=session)
+    user = crud.get_user_by_username(username=token_data.username)
     if user is None:
         raise credentials_exception
     return UserPublic(**user.model_dump())
