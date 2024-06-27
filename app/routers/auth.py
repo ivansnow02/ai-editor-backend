@@ -13,6 +13,9 @@ from app.utils.auth import (
     create_access_token,
 )
 from app.utils.result import Res
+from fastapi import BackgroundTasks
+
+from app.utils.send_email import generate_email
 
 router = APIRouter(tags=["auth"], responses={404: {"description": "Not found"}})
 
@@ -72,13 +75,14 @@ async def register(
 
 
 @router.post("/send_code")
-async def send_code(email_code: EmailCode, r=Depends(get_redis)) -> Res:
+async def send_code(
+        email_code: EmailCode, background_tasks: BackgroundTasks, r=Depends(get_redis)
+) -> Res:
     email = email_code.email
     if crud.get_user_by_email(email=email):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered",
         )
-    code = send_email.generate_email(email)
-    r.set(email, code, ex=1200)
+    background_tasks.add_task(generate_email, email, r)
     return Res(msg="Send success")

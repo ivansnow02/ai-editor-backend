@@ -14,14 +14,14 @@ def generate_code():
     return "".join(random.choices(string.digits, k=6))
 
 
-def generate_email(to_addr) -> str:
+def generate_email(to_addr, r) -> str:
     code = generate_code()
     head = "邮箱验证码"
     """标题"""
     text = f"您的验证码{code}，该验证码20分钟内有效，请勿泄漏于他人！"
     """正文"""
     send(to_addr, head, text)
-    return code
+    r.set(to_addr, code, ex=1200)
 
 
 def send(_to_addr, subject, content):
