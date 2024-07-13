@@ -1,7 +1,9 @@
 import hashlib
 import io
 import os
-
+import base64
+from sqlmodel import SQLModel
+import numpy as np
 from PIL import Image
 from fastapi import APIRouter, Depends, File, Query, UploadFile
 
@@ -22,27 +24,27 @@ router = APIRouter(
 ocrModel = init_ocr()
 
 
-@router.post(path="/upload")
-async def upload_img(
-    file: UploadFile = File(...),
-    user: UserPublic = Depends(get_current_user),
-):
-    # 保存图片
-    img = Image.open(io.BytesIO(await file.read()))
-    dir_path = "static/"
-    p = f"{dir_path}{user.id}/"
-    if file.filename is None:
-        return Res(code=400, msg="file name is None")
-    if not os.path.exists(p):
-        os.makedirs(p)
-    img_path = f"{p}{hashlib.md5(file.filename.encode()).hexdigest()}.{file.filename.split('.')[-1]}"
-    img.save(img_path)
-
-    image = crud.create_img(
-        img=ImageModel(path=f"{BASE_URL}/{img_path}", user_id=user.id)
-    )
-
-    return Res(data=image.model_dump())
+# @router.post(path="/upload")
+# async def upload_img(
+#     file: UploadFile = File(...),
+#     user: UserPublic = Depends(get_current_user),
+# ):
+#     # 保存图片
+#     img = Image.open(io.BytesIO(await file.read()))
+#     dir_path = "static/"
+#     p = f"{dir_path}{user.id}/"
+#     if file.filename is None:
+#         return Res(code=400, msg="file name is None")
+#     if not os.path.exists(p):
+#         os.makedirs(p)
+#     img_path = f"{p}{hashlib.md5(file.filename.encode()).hexdigest()}.{file.filename.split('.')[-1]}"
+#     img.save(img_path)
+#
+#     image = crud.create_img(
+#         img=ImageModel(path=f"{BASE_URL}/{img_path}", user_id=user.id)
+#     )
+#
+#     return Res(data=image.model_dump())
 
 
 # @router.get(path="/{img_id}")
@@ -61,26 +63,23 @@ async def upload_img(
 #     return Res(data=image.model_dump())
 #
 
+class ImgIn(SQLModel):
+    img_b64: str
 
-@router.get(path="/ocr")
-async def ocr_img(
-        img_path: str = Query(title="图片路径", description="图片路径"),
-    user: UserPublic = Depends(get_current_user),
-):
 
-    if img_path is None:
-        return Res(code=400, msg="img_path is None")
-    print(img_path)
-    user_id = crud.get_img_user_id(path=img_path)
-    if user_id != user.id:
-        return Res(code=400, msg="img is not belong to you")
-    # file_name = img_path.split("/")[-1]
-    # fpath = './../static/' + file_name
-    # print(img_path)
-    #  如果是本地路径，需要去掉前面的BASE_URL
-    if img_path.startswith(BASE_URL):
-        img_path = img_path[len(BASE_URL) + 1:]
-    result = ocrModel.ocr(img=img_path)
+@router.post(path="/ocr")
+async def ocr_img(imgIn: ImgIn):
+    img_b64 = imgIn.img_b64
+    if img_b64 is None:
+        return Res(code=400, msg="img is None")
+
+    img_b64 = img_b64.split(",")[-1]
+    # Base64 to image
+    img = Image.open(io.BytesIO(base64.b64decode(img_b64)))
+    # Convert PIL Image to numpy array
+    img_np = np.array(img)
+
+    result = ocrModel.ocr(img=img_np)
     if not result:
         return Res(code=400, msg="ocr failed")
     texts = [item[1][0] for res in result for item in res]

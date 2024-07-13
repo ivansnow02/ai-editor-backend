@@ -15,6 +15,7 @@ REDIS_DB = settings.REDIS.DB
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
+
 def get_redis():
     r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
     try:

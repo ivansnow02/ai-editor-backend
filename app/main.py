@@ -34,7 +34,7 @@ app.include_router(
 )
 app.include_router(
     ocr.router,
-    dependencies=[Depends(get_current_user)],
+    # dependencies=[Depends(get_current_user)],
 )
 app.include_router(
     user.router,
