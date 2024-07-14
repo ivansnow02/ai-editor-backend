@@ -8,6 +8,9 @@ from app.db import engine
 from app.dependencies import get_current_user
 from app.routers import auth, chat_with_history, format, langserve, ocr, user
 from config import settings
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SQLModel.metadata.create_all(engine)
 
