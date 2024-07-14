@@ -80,4 +80,10 @@ DB = 0
 python run.py serve
 ```
 
+## Docker部署
+
+```bash
+docker-compose up -d
+```
+
 ## [接口文档](/docs/api.md)
