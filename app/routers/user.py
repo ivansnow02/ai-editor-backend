@@ -32,8 +32,8 @@ def create_user(obj_in: UserCreate) -> Res:
 
 @router.patch(path="/me", response_model=Res)
 def patch_user(
-    obj_in: UserUpdate,
-    current_user: UserPublic = Depends(get_current_user),
+        obj_in: UserUpdate,
+        current_user: UserPublic = Depends(get_current_user),
 ) -> Res:
     current_user_id = current_user.id
     data: UserPublic = crud.patch_user(pk=current_user_id, obj_in=obj_in)
@@ -42,7 +42,7 @@ def patch_user(
 
 @router.delete(path="/me", response_model=Res)
 def delete_user(
-    current_user: UserPublic = Depends(get_current_user),
+        current_user: UserPublic = Depends(get_current_user),
 ) -> Res:
     current_user_id = current_user.id
     crud.delete_user(pk=current_user_id)
@@ -52,3 +52,6 @@ def delete_user(
 @router.get("/me", response_model=Res)
 def read_users_me(current_user: UserPublic = Depends(get_current_user)):
     return Res(data=current_user.model_dump())
+
+
+

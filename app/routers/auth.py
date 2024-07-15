@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app import crud
 from app.dependencies import get_redis
-from app.models import EmailCode, Token, UserCreate, UserPublic
+from app.models import EmailCode, Token, UserCreate, UserPatch, UserPublic
 from app.utils import send_email
 from app.utils.auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -85,7 +85,7 @@ async def send_code(
 
 @router.patch("/reset_password")
 async def reset_password(
-        obj_in: UserCreate,
+        obj_in: UserPatch,
         email_code: EmailCode,
         r=Depends(get_redis),
 ) -> Res:
@@ -109,3 +109,13 @@ async def reset_password(
     data: UserPublic = crud.patch_user_by_email(obj_in=obj_in)
     r.delete(email)
     return Res(data=data.model_dump())
+
+
+@router.get("/user/{username}", response_model=Res)
+def read_user(username: str):
+    return Res(data=crud.get_user_by_username(username=username) is not None)
+
+
+@router.get("/email/{email}", response_model=Res)
+def check_email(email: str):
+    return Res(data=crud.get_user_by_email(email=email) is not None)
