@@ -15,7 +15,7 @@ RUN apt-get update
 RUN apt-get install -y libreoffice
 # Install any needed packages specified in requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt --index-url https://mirrors.aliyun.com/pypi/simple/
 # 在你的 Dockerfile 中添加这行命令来安装缺失的库
 RUN apt-get update && apt-get install -y libgl1-mesa-glx
 # Make port 80 available to the world outside this container

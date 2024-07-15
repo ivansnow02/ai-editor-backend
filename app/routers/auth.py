@@ -22,7 +22,7 @@ router = APIRouter(tags=["auth"], responses={404: {"description": "Not found"}})
 
 @router.post("/token")
 async def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+        form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Token:
     user = crud.get_user_by_username(username=form_data.username)
     user = authenticate_user(user, form_data.password)
@@ -42,9 +42,9 @@ async def login_for_access_token(
 
 @router.post("/register")
 async def register(
-    obj_in: UserCreate,
-    email_code: EmailCode,
-    r=Depends(get_redis),
+        obj_in: UserCreate,
+        email_code: EmailCode,
+        r=Depends(get_redis),
 ) -> Res:
     email = obj_in.email
     if crud.get_user_by_email(email=email):
@@ -79,10 +79,33 @@ async def send_code(
         email_code: EmailCode, background_tasks: BackgroundTasks, r=Depends(get_redis)
 ) -> Res:
     email = email_code.email
-    if crud.get_user_by_email(email=email):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered",
-        )
     background_tasks.add_task(generate_email, email, r)
     return Res(msg="Send success")
+
+
+@router.patch("/reset_password")
+async def reset_password(
+        obj_in: UserCreate,
+        email_code: EmailCode,
+        r=Depends(get_redis),
+) -> Res:
+    email = obj_in.email
+    if not crud.get_user_by_email(email=email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email not registered",
+        )
+    if not r.get(email):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Code expired",
+        )
+    if email_code.code != r.get(email).decode("utf-8"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Code error",
+        )
+
+    data: UserPublic = crud.patch_user_by_email(obj_in=obj_in)
+    r.delete(email)
+    return Res(data=data.model_dump())

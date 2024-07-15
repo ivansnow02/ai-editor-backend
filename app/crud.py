@@ -88,3 +88,21 @@ def get_img_user_id(path: str) -> int:
     with Session(engine) as session:
         img = session.exec(select(ImageModel).where(ImageModel.path == path)).first()
         return img.user_id
+
+
+def patch_user_by_email(obj_in):
+    with Session(engine) as session:
+        user = session.exec(select(User).where(User.email == obj_in.email)).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        user_data = obj_in.model_dump(exclude_unset=True)
+        extra_data = {}
+        if "password" in user_data:
+            password = user_data["password"]
+            hashed_password = get_password_hash(password)
+            extra_data["hashed_password"] = hashed_password
+        user.sqlmodel_update(user_data, update=extra_data)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+        return UserPublic(**user.model_dump())
