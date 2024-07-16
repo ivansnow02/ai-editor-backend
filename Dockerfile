@@ -7,7 +7,6 @@ WORKDIR /app
 
 COPY ./requirements.txt /app/requirements.txt
 
-
 # 更新包列表
 RUN apt-get update
 
@@ -15,11 +14,10 @@ RUN apt-get update
 RUN apt-get install -y libreoffice
 # Install any needed packages specified in requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt --index-url https://mirrors.aliyun.com/pypi/simple/
+RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 # 在你的 Dockerfile 中添加这行命令来安装缺失的库
 
-RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list \
+
 
 RUN apt-get update && apt-get install -y libgl1-mesa-glx
 # Make port 80 available to the world outside this container
