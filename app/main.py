@@ -52,6 +52,8 @@ def run():
         app=app,
         host=settings.HOST,
         port=settings.PORT,
+        ssl_certfile=settings.SSL_CERTFILE,
+        ssl_keyfile=settings.SSL_KEYFILE,
     )
 
 

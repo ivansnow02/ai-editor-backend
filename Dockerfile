@@ -1,26 +1,20 @@
 FROM python:3.10
-# Set the working directory
+
 
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+
+# 更新包列表并安装 libreoffice、libgl1-mesa-glx 和 openssl
+RUN apt-get update && apt-get install -y libreoffice libgl1-mesa-glx openssl
+
+# 生成自签名 SSL 证书和私钥
+RUN openssl req -x509 -newkey rsa:4096 -keyout /app/key.pem -out /app/cert.pem -days 365 -nodes -subj "/C=CN/ST=Jiangsu/L=Xuzhou/O=KXJ/CN=47.113.180.204"
+
 
 COPY ./requirements.txt /app/requirements.txt
-
-# 更新包列表
-RUN apt-get update
-
-# 安装 LibreOffice
-RUN apt-get install -y libreoffice
-# Install any needed packages specified in requirements.txt
-
-RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-# 在你的 Dockerfile 中添加这行命令来安装缺失的库
+RUN pip install --no-cache-dir -r requirements.txt
 
 
-
-RUN apt-get update && apt-get install -y libgl1-mesa-glx
-# Make port 80 available to the world outside this container
 
 EXPOSE 8000
 
