@@ -44,7 +44,6 @@ app.include_router(
     dependencies=[Depends(get_current_user)],
 )
 app.include_router(auth.router)
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 def run():
